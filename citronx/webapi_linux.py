@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # Made by papi
 # Created on: Fri 07 Mar 2025 11:26:16 AM GMT
-# webapi_linux.py
+# webapilinux.py
 # Description:
 #  use the webapi of citrix with this tool on linux
 
