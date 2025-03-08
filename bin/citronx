@@ -5,3 +5,62 @@
 # citronx
 # Description:
 #  A python tool to work with citrix
+
+import sys, getopt
+import requests
+
+from citronx.config import *
+from citronx.gui import *
+from citronx.webapi_linux import *
+
+def usage():
+	print(f"{sys.argv[0]}: A slick citrix scanner made by p4p1")
+	print(f"\t-h\t--help - Show this message.")
+	print(f"\t-g\t--gui - A gui interface to view your citrix apps and run them.")
+	# add the posibility to provide config file through cmd line
+	# add the scanner option
+
+def login_user(config, username, password):
+	session = requests.Session()
+	if is_online(config["server"], session):
+		citrix_config = get_config(config["server"], session)
+		device_id = register_receiver(config["server"], session, citrix_config)
+		if device_id == None:
+			print("ERROR DEVICE ID IS NONE")
+			return (None, None)
+		if login(config["server"], session, citrix_config,
+				creds={'user':username, 'pass': password}):
+			apps = get_app_list(config["server"], session)
+			return (session, apps)
+		else:
+			return (None, None)
+	else:
+		return (None, None)
+
+def run_gui():
+	conf = load_config()
+	citrix_data = []
+	for user in conf["users"]:
+		session, apps = login_user(conf, user["username"], user["password"])
+		citrix_data.append({
+			'username': user["username"],
+			'session': session,
+			'apps': apps
+		})
+	gui = Citronx(citrix_data=citrix_data, config=conf)
+	gui.run()
+
+if __name__ == "__main__":
+	try:
+		opts, args = getopt.getopt(sys.argv[1:], "hg", ["--help", "--gui"])
+	except getopt.GetoptError as err:
+		print(str(err))
+		sys.exit(2)
+
+	for opt, arg in opts:
+		if opt in ('-h', '--help'):
+			usage()
+		elif opt in ('-g', '--gui'):
+			run_gui()
+
+

@@ -60,9 +60,7 @@ def launch_app(endpoint, session, app, verify=False):
 	with open('/tmp/tmp.ica', 'w') as fp:
 		fp.write(res.text)
 
-	os.system("/home/p4p1/Documents/github/citronx/assets/linuxx64/wfica.sh /tmp/tmp.ica")
-
-
+	os.system("/home/p4p1/Documents/work/mm/vie/wk_inst/linuxx64/wfica.sh /tmp/tmp.ica")
 
 def register_receiver(endpoint, session, remote_config, verify=False):
 	session.headers.update({
