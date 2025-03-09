@@ -7,18 +7,20 @@
 #  A python tool to work with citrix
 
 import sys, getopt
+import pprint
 import requests
 
 from citronx.config import *
 from citronx.gui import *
 from citronx.webapi_linux import *
+from citronx.scanner import *
 
 def usage():
 	print(f"{sys.argv[0]}: A slick citrix scanner made by p4p1")
 	print(f"\t-h\t--help - Show this message.")
 	print(f"\t-g\t--gui - A gui interface to view your citrix apps and run them.")
+	print(f"\t-s\t--scan - Get all of the configuration from citrix and application data from each user.")
 	# add the posibility to provide config file through cmd line
-	# add the scanner option
 
 def login_user(config, username, password):
 	session = requests.Session()
@@ -42,6 +44,8 @@ def run_gui():
 	citrix_data = []
 	for user in conf["users"]:
 		session, apps = login_user(conf, user["username"], user["password"])
+		if session == None or apps == None:
+			continue
 		citrix_data.append({
 			'username': user["username"],
 			'session': session,
@@ -50,17 +54,42 @@ def run_gui():
 	gui = Citronx(citrix_data=citrix_data, config=conf)
 	gui.run()
 
+def run_scanner():
+	conf = load_config()
+	data = get_customs(conf["server"])
+	if data == None:
+		print("Url offline!")
+		sys.exit(-1)
+	print("Custom Scripts:")
+	print(data)
+	for user in conf["users"]:
+		session, apps = login_user(conf, user["username"], user["password"])
+		if session == None or apps == None:
+			continue
+		print("\n\nFound %d citrix apps for %s:" % (len(apps), user["username"]))
+		for app in apps:
+			pprint.pprint(app)
+	auth_config = get_auth_config(conf["server"], session)
+	print("\n\nCitrix auth types:")
+	pprint.pprint(auth_config)
+	remote_config = get_config(conf["server"], session)
+	print("\n\nCitrix configuration:")
+	pprint.pprint(remote_config)
+
 if __name__ == "__main__":
 	try:
-		opts, args = getopt.getopt(sys.argv[1:], "hg", ["--help", "--gui"])
+		opts, args = getopt.getopt(sys.argv[1:], "hgs", ["--help", "--gui", "--scan"])
 	except getopt.GetoptError as err:
 		print(str(err))
 		sys.exit(2)
 
 	for opt, arg in opts:
+		if opt in ('-s', '--scan'):
+			run_scanner()
 		if opt in ('-h', '--help'):
 			usage()
 		elif opt in ('-g', '--gui'):
 			run_gui()
+
 
 

@@ -7,4 +7,6 @@
 #  The citronx lib things
 
 from .webapi_linux import *
+from .scanner import *
+from .config import *
 from .gui import *

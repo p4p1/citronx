@@ -10,6 +10,7 @@ setup(
 	packages=['citronx'],
 	install_requires=[
 		"requests",
+		"beautifulsoup4",
 		"textual"
 	],
 	scripts=['bin/citronx'],
