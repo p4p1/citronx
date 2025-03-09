@@ -30,7 +30,7 @@ class UserRow(Static):
 	def on_button_pressed(self, event:Button.Pressed) -> None:
 		self.notify(f"Launching: {self.appdata['name']}")
 		if "fakeurl" not in self.config["server"]:
-			launch_app(self.config["server"], self.session, self.appdata)
+			launch_app(self.config["server"], self.session, self.appdata, self.config["run_ica"], verify=self.config["secure"])
 
 class Citronx(App[str]):
 	TITLE = "Citronx"

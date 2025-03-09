@@ -1,0 +1,11 @@
+{
+    "server": "localhost/citrix/WebStore/",
+    "run_ica": "/home/p4p1/Documents/work/mm/vie/wk_inst/linuxx64/wfica.sh",
+    "secure": false,
+    "users": [
+        {
+            "username": "domain\\user",
+            "password": "password"
+        }
+    ]
+}

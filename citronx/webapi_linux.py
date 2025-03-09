@@ -35,7 +35,7 @@ def get_auth_config(endpoint, session, verify=False):
 		return None
 
 def get_app_list(endpoint, session, verify=False):
-	remote_config = get_config(endpoint, session)
+	remote_config = get_config(endpoint, session, verify=verify)
 	if remote_config == None:
 		print("error")
 		return None
@@ -46,7 +46,7 @@ def get_app_list(endpoint, session, verify=False):
 	else:
 		return None
 
-def launch_app(endpoint, session, app, verify=False):
+def launch_app(endpoint, session, app, run_ica, verify=False):
 	parameter_tool_launching_app="action=launch&serverProtocolVersion=1&transport=https&ticket="
 
 	appdata = {
@@ -60,7 +60,7 @@ def launch_app(endpoint, session, app, verify=False):
 	with open('/tmp/tmp.ica', 'w') as fp:
 		fp.write(res.text)
 
-	os.system("/home/p4p1/Documents/work/mm/vie/wk_inst/linuxx64/wfica.sh /tmp/tmp.ica")
+	os.system("%s /tmp/tmp.ica", run_ica)
 
 def register_receiver(endpoint, session, remote_config, verify=False):
 	session.headers.update({
@@ -77,7 +77,7 @@ def register_receiver(endpoint, session, remote_config, verify=False):
 		return None
 
 def login(endpoint, session, remote_config, creds={"user":"bob","pass":"bob"}, verify=False):
-	auth_config = get_auth_config(endpoint, session)
+	auth_config = get_auth_config(endpoint, session, verify=verify)
 	uri = next(m['@url'] for m in auth_config['authMethods']['method'] if m['@name'] == 'ExplicitForms')
 	res = session.post("https://" + endpoint + "/" + uri, verify=verify)
 
@@ -123,4 +123,4 @@ if __name__ == "__main__":
 			for app in apps:
 				print(app["name"])
 			while (n := input(f"Enter a number between 0 and {len(apps)-1}: ")).isdigit() and 0 <= (n := int(n)) < len(apps):
-				launch_app(ENDPOINT_URL, session, apps[n])
+				launch_app(ENDPOINT_URL, session, apps[n], "/home/p4p1/Documents/work/mm/vie/wk_inst/linuxx64/wfica.sh")

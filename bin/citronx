@@ -20,27 +20,30 @@ def usage():
 	print(f"\t-h\t--help - Show this message.")
 	print(f"\t-g\t--gui - A gui interface to view your citrix apps and run them.")
 	print(f"\t-s\t--scan - Get all of the configuration from citrix and application data from each user.")
-	# add the posibility to provide config file through cmd line
+	print(f"\t-c\t--conf - Provide a different config file.")
 
 def login_user(config, username, password):
 	session = requests.Session()
-	if is_online(config["server"], session):
-		citrix_config = get_config(config["server"], session)
-		device_id = register_receiver(config["server"], session, citrix_config)
+	if is_online(config["server"], session, verify=config["secure"]):
+		citrix_config = get_config(config["server"], session, verify=config["secure"])
+		device_id = register_receiver(config["server"], session, citrix_config, verify=config["secure"])
 		if device_id == None:
 			print("ERROR DEVICE ID IS NONE")
 			return (None, None)
 		if login(config["server"], session, citrix_config,
-				creds={'user':username, 'pass': password}):
-			apps = get_app_list(config["server"], session)
+				creds={'user':username, 'pass': password}, verify=config["secure"]):
+			apps = get_app_list(config["server"], session, verify=config["secure"])
 			return (session, apps)
 		else:
 			return (None, None)
 	else:
 		return (None, None)
 
-def run_gui():
-	conf = load_config()
+def run_gui(custom_conf):
+	if custom_conf is not None:
+		conf = load_config(custom_conf)
+	else:
+		conf = load_config()
 	citrix_data = []
 	for user in conf["users"]:
 		session, apps = login_user(conf, user["username"], user["password"])
@@ -54,9 +57,12 @@ def run_gui():
 	gui = Citronx(citrix_data=citrix_data, config=conf)
 	gui.run()
 
-def run_scanner():
-	conf = load_config()
-	data = get_customs(conf["server"])
+def run_scanner(custom_conf):
+	if custom_conf is not None:
+		conf = load_config(custom_conf)
+	else:
+		conf = load_config()
+	data = get_customs(conf["server"], verify=config["secure"])
 	if data == None:
 		print("Url offline!")
 		sys.exit(-1)
@@ -69,27 +75,34 @@ def run_scanner():
 		print("\n\nFound %d citrix apps for %s:" % (len(apps), user["username"]))
 		for app in apps:
 			pprint.pprint(app)
-	auth_config = get_auth_config(conf["server"], session)
+	auth_config = get_auth_config(conf["server"], session, verify=config["secure"])
 	print("\n\nCitrix auth types:")
 	pprint.pprint(auth_config)
-	remote_config = get_config(conf["server"], session)
+	remote_config = get_config(conf["server"], session, verify=config["secure"])
 	print("\n\nCitrix configuration:")
 	pprint.pprint(remote_config)
 
 if __name__ == "__main__":
+	default = os.environ["HOME"] + "/.config/citronx/config.json"
+	custom_conf = None
+
+	if not os.path.exists(default):
+		create_config()
 	try:
-		opts, args = getopt.getopt(sys.argv[1:], "hgs", ["--help", "--gui", "--scan"])
+		opts, args = getopt.getopt(sys.argv[1:], "hgsc:", ["--help", "--gui", "--scan", "--conf"])
 	except getopt.GetoptError as err:
 		print(str(err))
 		sys.exit(2)
 
 	for opt, arg in opts:
+		if opt in ("-c", "--conf"):
+			custom_conf = arg
 		if opt in ('-s', '--scan'):
-			run_scanner()
+			run_scanner(custom_conf)
 		if opt in ('-h', '--help'):
 			usage()
 		elif opt in ('-g', '--gui'):
-			run_gui()
+			run_gui(custom_conf)
 
 
 
