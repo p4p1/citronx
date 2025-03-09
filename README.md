@@ -20,7 +20,7 @@ to run ica files you need to donwload the citrix client side application [here](
 ``` json
 {
     "server": "localhost/citrix/WebStore/",
-    "run_ica": "/home/p4p1/Documents/work/mm/vie/wk_inst/linuxx64/wfica.sh",
+    "run_ica": "/tool/path/linuxx64/wfica.sh",
     "secure": false,
     "users": [
         {
