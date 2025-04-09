@@ -60,7 +60,7 @@ def launch_app(endpoint, session, app, run_ica, verify=False):
 	with open('/tmp/tmp.ica', 'w') as fp:
 		fp.write(res.text)
 
-	os.system("%s /tmp/tmp.ica", run_ica)
+	os.system("%s /tmp/tmp.ica" % run_ica)
 
 def register_receiver(endpoint, session, remote_config, verify=False):
 	session.headers.update({

@@ -62,7 +62,7 @@ def run_scanner(custom_conf):
 		conf = load_config(custom_conf)
 	else:
 		conf = load_config()
-	data = get_customs(conf["server"], verify=config["secure"])
+	data = get_customs(conf["server"], verify=conf["secure"])
 	if data == None:
 		print("Url offline!")
 		sys.exit(-1)
@@ -75,10 +75,10 @@ def run_scanner(custom_conf):
 		print("\n\nFound %d citrix apps for %s:" % (len(apps), user["username"]))
 		for app in apps:
 			pprint.pprint(app)
-	auth_config = get_auth_config(conf["server"], session, verify=config["secure"])
+	auth_config = get_auth_config(conf["server"], session, verify=conf["secure"])
 	print("\n\nCitrix auth types:")
 	pprint.pprint(auth_config)
-	remote_config = get_config(conf["server"], session, verify=config["secure"])
+	remote_config = get_config(conf["server"], session, verify=conf["secure"])
 	print("\n\nCitrix configuration:")
 	pprint.pprint(remote_config)
 
