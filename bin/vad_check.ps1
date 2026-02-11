@@ -1,5 +1,6 @@
-# ddc_check.ps1
-# A powershell script to run on a citrix ddc to enumerate the citrix instance
+# vad_check.ps1
+# A powershell script to run on a citrix Virtual Apps and Desktop Server
+# to enumerate the citrix instance applications databases and virtual desktops
 
 asnp Citrix.*
 
@@ -22,10 +23,10 @@ Write-Host "===================================================" -ForegroundColo
 Get-BrokerUnconfiguredMachine
 
 Write-Host "===================================================" -ForegroundColor Green
-Write-Host " Admin Folder "
+Write-Host " Broker Admin Folder "
 Write-Host "===================================================" -ForegroundColor Green
 
-Get-BrokerAdminFolder
+Get-BrokerAdminFolder | Select-Object Name
 
 Write-Host "===================================================" -ForegroundColor Green
 Write-Host " Access Policy Rules "
@@ -37,7 +38,7 @@ Write-Host "===================================================" -ForegroundColo
 Write-Host " Reboot Schedule "
 Write-Host "===================================================" -ForegroundColor Green
 
-Get-BrokerRebootScheduleV2
+Get-BrokerRebootScheduleV2 | Select-Object Name,Day,Frequency,DesktopGroupName,Enabled
 
 Write-Host "===================================================" -ForegroundColor Green
 Write-Host " Application List "
@@ -52,3 +53,5 @@ Get-BrokerApplication -MaxRecordCount 1000 | Select-Object * | ForEach-Object {
 	}
 	$_
 } | Export-Csv -Path "c:\windows\temp\citrix_apps.csv" -NoTypeInformation
+
+Export-BrokerConfiguration > "c:\windows\temp\citrinx_conf.xml"
