@@ -5,7 +5,8 @@
     "users": [
         {
             "username": "domain\\user",
-            "password": "password"
+            "password": "password",
+            "domain": null
         }
     ]
 }

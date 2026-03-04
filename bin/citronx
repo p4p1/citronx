@@ -22,7 +22,7 @@ def usage():
 	print(f"\t-s\t--scan - Get all of the configuration from citrix and application data from each user.")
 	print(f"\t-c\t--conf - Provide a different config file.")
 
-def login_user(config, username, password):
+def login_user(config, user):
 	session = requests.Session()
 	if is_online(config["server"], session, verify=config["secure"]):
 		citrix_config = get_config(config["server"], session, verify=config["secure"])
@@ -31,7 +31,7 @@ def login_user(config, username, password):
 			print("ERROR DEVICE ID IS NONE")
 			return (None, None)
 		if login(config["server"], session, citrix_config,
-				creds={'user':username, 'pass': password}, verify=config["secure"]):
+				creds=user, verify=config["secure"]):
 			apps = get_app_list(config["server"], session, verify=config["secure"])
 			return (session, apps)
 		else:
@@ -46,7 +46,7 @@ def run_gui(custom_conf):
 		conf = load_config()
 	citrix_data = []
 	for user in conf["users"]:
-		session, apps = login_user(conf, user["username"], user["password"])
+		session, apps = login_user(conf, user)
 		if session == None or apps == None:
 			continue
 		citrix_data.append({
@@ -69,12 +69,15 @@ def run_scanner(custom_conf):
 	print("Custom Scripts:")
 	print(data)
 	for user in conf["users"]:
-		session, apps = login_user(conf, user["username"], user["password"])
+		session, apps = login_user(conf, user)
 		if session == None or apps == None:
 			continue
 		print("\n\nFound %d citrix apps for %s:" % (len(apps), user["username"]))
 		for app in apps:
 			pprint.pprint(app)
+	if session == None:
+		print("[!] Login failed!")
+		return
 	auth_config = get_auth_config(conf["server"], session, verify=conf["secure"])
 	print("\n\nCitrix auth types:")
 	pprint.pprint(auth_config)

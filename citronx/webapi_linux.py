@@ -83,13 +83,23 @@ def login(endpoint, session, remote_config, creds={"user":"bob","pass":"bob"}, v
 
 	# TODO: add verificatoin of res.xml.explicit aut
 
-	form = {
-		"username":creds["user"], # DONT FORGET TO EDIT THIS TOO
-		"password":creds["pass"], # DONT FORGET TO REPLACE
-		"saveCredentials": "false",
-		"loginBtn": "Log On",
-		"StateContext": ""
-	}
+	if creds["domain"] == None:
+		form = {
+			"username":creds["username"], # DONT FORGET TO EDIT THIS TOO
+			"password":creds["password"], # DONT FORGET TO REPLACE
+			"saveCredentials": "false",
+			"loginBtn": "Log On",
+			"StateContext": ""
+		}
+	else:
+		form = {
+			"username":creds["username"], # DONT FORGET TO EDIT THIS TOO
+			"password":creds["password"], # DONT FORGET TO REPLACE
+			"domain":creds["domain"],
+			"saveCredentials": "false",
+			"loginBtn": "Log On",
+			"StateContext": ""
+		}
 
 	res = session.post("https://" + endpoint + "/ExplicitAuth/LoginAttempt", verify=verify, data=form)
 
